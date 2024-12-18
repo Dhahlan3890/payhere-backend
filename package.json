@@ -9,7 +9,6 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "description": "",
   "dependencies": {
     "body-parser": "^1.20.2",
     "cors": "^2.8.5",
@@ -17,5 +16,6 @@
   },
   "devDependencies": {
     "nodemon": "^3.1.4"
-  }
+  },
+  "description": ""
 }
