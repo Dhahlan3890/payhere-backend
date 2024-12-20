@@ -1,41 +1,45 @@
-const express = require('express');
-const crypto = require('crypto');
+const express = require("express");
+const crypto = require("crypto");
 
 const router = express.Router();
 
-const merchant_id = '1229031';
-const merchant_secret = 'MTM2MTQ1MjczMDU5NjYwOTAxNDMwNjU3NjkzNDU0Mjc0NDYy';
+// Merchant details
+const merchant_id = "1229031"; // Replace with your actual Merchant ID
+const merchant_secret = "MTM2MTQ1MjczMDU5NjYwOTAxNDMwNjU3NjkzNDU0Mjc0NDYy"; // Replace with your Merchant Secret
 
-router.post('/start', (req, res) => {
+router.post("/start", (req, res) => {
   const { order_id, amount, currency } = req.body;
-  console.log('Payment request for order:', order_id);
+  console.log("Payment request for order:", order_id);
+  
 
   // Generate the hash value
   const hash = crypto
-    .createHash('md5')
+    .createHash("md5")
     .update(
       merchant_id +
         order_id +
         amount +
         currency +
         crypto
-          .createHash('md5')
+          .createHash("md5")
           .update(merchant_secret)
-          .digest('hex')
+          .digest("hex")
           .toUpperCase()
     )
-    .digest('hex')
+    .digest("hex")
     .toUpperCase();
 
-  console.log('Hash generated for order:', order_id);
+    console.log("Hash generated for order:", order_id);
+    
 
   res.json({ hash, merchant_id });
 });
 
 // Payment notification endpoint
-router.post('/notify', (req, res) => {
-  console.log('Payment notification received');
+router.post("/notify", (req, res) => {
 
+  console.log("Payment notification received");
+  
   const {
     merchant_id,
     order_id,
@@ -43,11 +47,10 @@ router.post('/notify', (req, res) => {
     payhere_currency,
     status_code,
     md5sig,
-    plan,
   } = req.body;
 
   const local_md5sig = crypto
-    .createHash('md5')
+    .createHash("md5")
     .update(
       merchant_id +
         order_id +
@@ -55,24 +58,26 @@ router.post('/notify', (req, res) => {
         payhere_currency +
         status_code +
         crypto
-          .createHash('md5')
+          .createHash("md5")
           .update(merchant_secret)
-          .digest('hex')
+          .digest("hex")
           .toUpperCase()
     )
-    .digest('hex')
+    .digest("hex")
     .toUpperCase();
 
-  console.log('Payment notification for order:', order_id);
-  console.log('Plan for order:', plan);
+    console.log("Payment notification for order:", order_id);
 
-  if (local_md5sig === md5sig && status_code == '2') {
+
+    
+
+  if (local_md5sig === md5sig && status_code == "2") {
     // Payment success - update the database
-    console.log('Payment successful for order:', order_id);
+    console.log("Payment successful for order:", order_id);
     res.sendStatus(200);
   } else {
     // Payment verification failed
-    console.log('Payment verification failed for order:', order_id);
+    console.log("Payment verification failed for order:", order_id);
     res.sendStatus(400);
   }
 });
